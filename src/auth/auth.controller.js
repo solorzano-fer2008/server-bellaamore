@@ -6,7 +6,7 @@ export const register = async (req, res) => {
     try {
         const data = req.body
 
-        let profilepicture = req.file ? `profiles/${req.file.filename}` : 'profiles/default-avatar.png'
+        let profilepicture = req.file ? req.file.path : 'https://res.cloudinary.com/dgzqcs3cq/image/upload/v1715636000/profiles/default-avatar.png'
         const encryptedPassword = await hash(data.password)
 
         const newuser = await User.create({
@@ -122,7 +122,7 @@ export const updateProfile = async (req, res) => {
 
         // Si se subió una nueva imagen
         if (req.file) {
-            updateData.profilepicture = `profiles/${req.file.filename}`;
+            updateData.profilepicture = req.file.path;
         }
 
         const updatedUser = await User.findByIdAndUpdate(

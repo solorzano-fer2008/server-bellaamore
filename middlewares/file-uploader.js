@@ -1,24 +1,12 @@
 import multer from "multer";
-import { dirname, extname, join, basename } from 'path';
-import { fileURLToPath } from "url";
-import { v4 as uuidv4 } from 'uuid';
+import { createCloudinaryStorage } from "../configs/cloudinary.js";
 
-const CURRENT_DIR = dirname(fileURLToPath(import.meta.url))
 const MIMETYPES = ["image/jpg", "image/jpeg", "image/png"]
 const MAX_FILE_SIZE = 5 * 1024 * 1024 //5MB
 
-const createMulterConfig = (destinationPath, subFolder) => {
+const createMulterConfig = (folder) => {
     return multer({
-        storage: multer.diskStorage({
-            destination: join(CURRENT_DIR, destinationPath),
-            filename: (req, file, cb) => {
-                const fileExtension = extname(file.originalname)
-                const fileName = file.originalname.split(fileExtension)[0]
-                const shortUuid = uuidv4().substring(0, 8)
-                const generatedName = `${fileName}-${shortUuid}-${fileExtension}`
-                cb(null, generatedName)
-            }
-        }),
+        storage: createCloudinaryStorage(folder),
         fileFilter: (req, file, cb) => {
             if (MIMETYPES.includes(file.mimetype)) cb(null, true)
             else cb(new Error('Tipo de archivo no permitido'))
@@ -30,5 +18,6 @@ const createMulterConfig = (destinationPath, subFolder) => {
 }
 
 
-export const uploadProfilePicturre = createMulterConfig("../assets/img/profiles", "profiles")
-export const uploadPostImage = createMulterConfig("../assets/img/posts", "posts")
+export const uploadProfilePicturre = createMulterConfig("profiles")
+export const uploadPostImage = createMulterConfig("posts")
+export const uploadProductImage = createMulterConfig("products")

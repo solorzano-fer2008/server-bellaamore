@@ -7,7 +7,7 @@ export const createPost = async (req, res) => {
     try {
         const { title, content, category, rating } = req.body
         const authorId = req.uid
-        let image = req.file ? req.file.filename : 'default-post.png'
+        let image = req.file ? req.file.path : 'https://res.cloudinary.com/dgzqcs3cq/image/upload/v1715636000/posts/default-post.png'
 
         console.log(req.uid)
         const post = await Post.create({
