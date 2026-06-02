@@ -60,7 +60,7 @@ const conectarDB = async () => {
 }
 export const initServer = async () => {
     const app = express();
-
+    console.log("Iniciando servidor ...")
     try {
         middlewares(app)
         routes(app)
