@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
 
 import 'dotenv/config';
 import User from "../src/users/user.model.js";
@@ -44,11 +45,18 @@ const routes = (app) => {
 
     // Servir la aplicación React (páginas de menú, etc. definidas en AppRoutes)
     const __dirname = dirname(fileURLToPath(import.meta.url));
-    app.use(express.static(join(__dirname, '../../client/dist')));
+    const distPath = join(__dirname, '../../client/dist');
 
-    app.get(/.*/, (req, res) => {
-        res.sendFile(join(__dirname, '../../client/dist/index.html'));
-    });
+    if (existsSync(distPath)) {
+        app.use(express.static(distPath));
+        app.get(/.*/, (req, res) => {
+            res.sendFile(join(distPath, 'index.html'));
+        });
+    } else {
+        app.get('/', (req, res) => {
+            res.send('API de Módulo 2 Mafer funcionando correctamente. Frontend no disponible en esta ruta.');
+        });
+    }
 }
 
 const conectarDB = async () => {
@@ -65,10 +73,9 @@ export const initServer = async () => {
         middlewares(app)
         routes(app)
         await conectarDB()
-        app.listen(process.env.PORT, () => {
-            console.log(`Server running on port: ${process.env.PORT}`)
-        })
+        return app;
     } catch (error) {
-        console.log(`Error al inciar el servidor: ${error}`);
+        console.log(`Error al iniciar el servidor: ${error}`);
+        throw error;
     }
 }
