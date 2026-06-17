@@ -1,0 +1,542 @@
+{
+  "info": {
+    "name": "Bella Amore API",
+    "description": "Colección de endpoints para el servidor de Bella Amore",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Juan",
+                  "type": "text"
+                },
+                {
+                  "key": "surname",
+                  "value": "Pérez",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "juanperez",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "juan@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": "1234567890",
+                  "type": "text",
+                  "description": "Opcional"
+                },
+                {
+                  "key": "profilePicture",
+                  "value": "",
+                  "type": "file",
+                  "description": "Opcional - Imagen de perfil"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Registrar un nuevo usuario en el sistema"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Iniciar sesión con email o username y contraseña"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"token\", jsonData.userDetails.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Juan Carlos",
+                  "type": "text",
+                  "description": "Opcional"
+                },
+                {
+                  "key": "surname",
+                  "value": "Pérez García",
+                  "type": "text",
+                  "description": "Opcional"
+                },
+                {
+                  "key": "username",
+                  "value": "juanperez2",
+                  "type": "text",
+                  "description": "Opcional"
+                },
+                {
+                  "key": "email",
+                  "value": "juan2@example.com",
+                  "type": "text",
+                  "description": "Opcional"
+                },
+                {
+                  "key": "phone",
+                  "value": "9876543210",
+                  "type": "text",
+                  "description": "Opcional"
+                },
+                {
+                  "key": "profilePicture",
+                  "value": "",
+                  "type": "file",
+                  "description": "Opcional - Nueva imagen de perfil"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/updateProfile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "updateProfile"]
+            },
+            "description": "Actualizar perfil de usuario (requiere token JWT)"
+          }
+        },
+        {
+          "name": "Get Image",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/getImage/:filename",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "getImage", ":filename"],
+              "variable": [
+                {
+                  "key": "filename",
+                  "value": "default-avatar.png",
+                  "description": "Nombre del archivo de imagen"
+                }
+              ]
+            },
+            "description": "Obtener imagen de perfil estática"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Create Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Mi nueva publicación",
+                  "type": "text"
+                },
+                {
+                  "key": "content",
+                  "value": "Este es el contenido de mi publicación",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "general",
+                  "type": "text"
+                },
+                {
+                  "key": "rating",
+                  "value": "5",
+                  "type": "text",
+                  "description": "Opcional - Rating del post"
+                },
+                {
+                  "key": "image",
+                  "value": "",
+                  "type": "file",
+                  "description": "Opcional - Imagen del post"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/posts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "posts"]
+            },
+            "description": "Crear una nueva publicación (requiere token JWT)"
+          }
+        },
+        {
+          "name": "Get All Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/posts?page=1&limit=8",
+              "host": ["{{base_url}}"],
+              "path": ["api", "posts"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Número de página (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "8",
+                  "description": "Cantidad de posts por página (default: 8)"
+                }
+              ]
+            },
+            "description": "Obtener todas las publicaciones con paginación"
+          }
+        },
+        {
+          "name": "Get Post By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/posts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "posts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "POST_ID",
+                  "description": "ID del post"
+                }
+              ]
+            },
+            "description": "Obtener una publicación específica por ID"
+          }
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/posts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "posts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "POST_ID",
+                  "description": "ID del post a eliminar"
+                }
+              ]
+            },
+            "description": "Eliminar una publicación (solo el autor puede eliminarla, requiere token JWT)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Create Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Este es mi comentario\",\n  \"post\": \"POST_ID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "comments"]
+            },
+            "description": "Crear un nuevo comentario en un post (requiere token JWT)"
+          }
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/comments/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "comments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "COMMENT_ID",
+                  "description": "ID del comentario a eliminar"
+                }
+              ]
+            },
+            "description": "Eliminar un comentario (solo el autor puede eliminarlo, requiere token JWT)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products?category=combos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "combos",
+                  "description": "Opcional - Filtrar por categoría (combos, individuales, bebidas, desayunos, postres)",
+                  "disable": true
+                }
+              ]
+            },
+            "description": "Obtener todos los productos (opcionalmente filtrados por categoría)"
+          }
+        },
+        {
+          "name": "Seed Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/products/seed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", "seed"]
+            },
+            "description": "Restaurar los productos por defecto en la base de datos"
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nuevo Producto\",\n  \"description\": \"Descripción del producto\",\n  \"price\": \"$150.00\",\n  \"image\": \"producto.jpg\",\n  \"category\": \"combos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Crear un nuevo producto (requiere token JWT)"
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Producto Actualizado\",\n  \"description\": \"Nueva descripción\",\n  \"price\": \"$180.00\",\n  \"image\": \"producto-actualizado.jpg\",\n  \"category\": \"individuales\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/products/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "PRODUCT_ID",
+                  "description": "ID del producto a actualizar"
+                }
+              ]
+            },
+            "description": "Actualizar un producto existente (requiere token JWT)"
+          }
+        },
+        {
+          "name": "Delete Product (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/products/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "PRODUCT_ID",
+                  "description": "ID del producto a eliminar"
+                }
+              ]
+            },
+            "description": "Eliminar un producto (soft delete - cambia status a false, requiere token JWT)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservations",
+      "item": [
+        {
+          "name": "Send Reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juan Pérez\",\n  \"email\": \"juan@example.com\",\n  \"phone\": \"1234567890\",\n  \"date\": \"2024-12-25\",\n  \"time\": \"19:00\",\n  \"guests\": 4,\n  \"special_request\": \"Mesa cerca de la ventana\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservations"]
+            },
+            "description": "Enviar una reservación (guarda en DB y envía email, requiere token JWT)"
+          }
+        }
+      ]
+    }
+  ]
+}
