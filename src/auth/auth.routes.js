@@ -12,10 +12,13 @@ const CURRENT_DIR = dirname(fileURLToPath(import.meta.url));
 
 const router = Router();
 
-router.post('/register',
-  publicLimiter,
-  registerValidator,
-  register
+router.post('/register', (req, res, next) => {
+  console.log('ENTRO A REGISTER');
+  next();
+},
+publicLimiter,
+registerValidator,
+register
 );
 
 router.put('/updateProfile',
