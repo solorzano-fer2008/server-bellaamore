@@ -14,7 +14,6 @@ const router = Router();
 
 router.post('/register',
   publicLimiter,
-  uploadProfilePicturre.single('profilePicture'),
   registerValidator,
   register
 );

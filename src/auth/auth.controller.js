@@ -6,7 +6,13 @@ export const register = async (req, res) => {
     try {
         const data = req.body
 
-        let profilepicture = req.file ? req.file.path : 'https://res.cloudinary.com/dgzqcs3cq/image/upload/v1715636000/profiles/default-avatar.png'
+        let profilepicture = 'https://res.cloudinary.com/dgzqcs3cq/image/upload/v1715636000/profiles/default-avatar.png'
+        
+        // Si hay archivo subido, usar su ruta
+        if (req.file && req.file.path) {
+            profilepicture = req.file.path
+        }
+
         const encryptedPassword = await hash(data.password)
 
         const newuser = await User.create({
@@ -31,6 +37,7 @@ export const register = async (req, res) => {
                 surname: newuser.surname,
                 phone: newuser.phone,
                 profilePicture: newuser.profilepicture,
+                role: newuser.role,
                 token: token
             }
         });
@@ -98,6 +105,7 @@ export const login = async (req, res) => {
                 surname: user.surname,
                 phone: user.phone,
                 profilePicture: user.profilepicture,
+                role: user.role,
                 token: token
             },
         });

@@ -32,6 +32,15 @@ const middlewares = (app) => {
         crossOriginEmbedderPolicy: false
     }));
     app.use(morgan('dev'));
+    
+    // Log de todas las peticiones
+    app.use((req, res, next) => {
+        console.log(`${req.method} ${req.url}`);
+        console.log('Headers:', req.headers);
+        console.log('Body:', req.body);
+        next();
+    });
+    
     const __dirname = dirname(fileURLToPath(import.meta.url));
     app.use('/assets', express.static(join(__dirname, '../../assets')));
 }
