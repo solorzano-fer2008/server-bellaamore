@@ -8,15 +8,13 @@ export const registerValidator = [
     check("name", "El nombre es obligatorio").not().isEmpty(),
     check("surname", "El apellido es obligatorio").not().isEmpty(),
     check("username", "El nombre de usuario es obligatorio").not().isEmpty(),
-    check("username").custom(usernameExists),
+    // check("username").custom(usernameExists),
     check("email", "No es un email válido").isEmail(),
-    check("email").custom(emailExists),
+    // check("email").custom(emailExists),
     check("password", "La contraseña debe de tener al menos 8 caracteres").isLength({
         min: 8
     }),
-    validarCampos,
-    processFileUpload,
-    deleteFileOnError
+    validarCampos
 ]
 
 export const loginValidator = [
