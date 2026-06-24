@@ -17,6 +17,7 @@ import postRoutes from '../src/posts/post.routes.js'
 import commentsRoutes from '../src/comments/comment.routes.js'
 import reservationRoutes from '../src/reservations/reservation.routes.js'
 import productRoutes from '../src/products/product.routes.js'
+import orderRoutes from '../src/orders/order.routes.js'
 
 const middlewares = (app) => {
     app.use(express.json());
@@ -51,6 +52,7 @@ const routes = (app) => {
     app.use('/api/comments', commentsRoutes);
     app.use('/api/reservations', reservationRoutes);
     app.use('/api/products', productRoutes);
+    app.use('/api/orders', orderRoutes);
 
     // Servir la aplicación React (páginas de menú, etc. definidas en AppRoutes)
     const __dirname = dirname(fileURLToPath(import.meta.url));
