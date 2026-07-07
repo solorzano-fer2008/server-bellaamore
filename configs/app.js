@@ -23,11 +23,15 @@ const middlewares = (app) => {
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }))
     app.use(cors({
-        origin: '*',
+        origin: [
+            "https://restaurantebellamore-46e17.web.app",
+            "http://localhost:5173"
+        ],
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization']
     }));
+    app.options("*", cors());
     app.use(helmet({
         crossOriginResourcePolicy: { policy: "cross-origin" },
         crossOriginEmbedderPolicy: false
