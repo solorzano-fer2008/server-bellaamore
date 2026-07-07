@@ -20,8 +20,7 @@ import productRoutes from '../src/products/product.routes.js'
 import orderRoutes from '../src/orders/order.routes.js'
 
 const middlewares = (app) => {
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: false }))
+    // CORS debe ser el primer middleware
     app.use(cors({
         origin: [
             "https://restaurantebellamore-46e17.web.app",
@@ -32,12 +31,15 @@ const middlewares = (app) => {
         allowedHeaders: ['Content-Type', 'Authorization']
     }));
     app.options("*", cors());
+
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: false }));
     app.use(helmet({
         crossOriginResourcePolicy: { policy: "cross-origin" },
         crossOriginEmbedderPolicy: false
     }));
     app.use(morgan('dev'));
-    
+
     // Log de todas las peticiones
     app.use((req, res, next) => {
         console.log(`${req.method} ${req.url}`);
@@ -45,7 +47,7 @@ const middlewares = (app) => {
         console.log('Body:', req.body);
         next();
     });
-    
+
     const __dirname = dirname(fileURLToPath(import.meta.url));
     app.use('/assets', express.static(join(__dirname, '../../assets')));
 }
