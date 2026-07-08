@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    /* Tamaño base de fuente normal */
+    font-size: 14px; 
+  }
+}
