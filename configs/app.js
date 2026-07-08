@@ -20,17 +20,24 @@ import productRoutes from '../src/products/product.routes.js'
 import orderRoutes from '../src/orders/order.routes.js'
 
 const middlewares = (app) => {
-    // CORS debe ser el primer middleware
+    // CORS configurado para Firebase
     app.use(cors({
-        origin: [
-            "https://restaurantebellamore-46e17.web.app",
-            "http://localhost:5173"
-        ],
+        origin: ['https://restaurantebellamore-46e17.web.app', 'http://localhost:5173', 'http://localhost:3000'],
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization']
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        preflightContinue: false,
+        optionsSuccessStatus: 204
     }));
-    app.options("*", cors());
+
+    // Manejar explícitamente las peticiones OPTIONS
+    app.options('*', (req, res) => {
+        res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.header('Access-Control-Allow-Credentials', 'true');
+        res.sendStatus(204);
+    });
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
@@ -60,20 +67,10 @@ const routes = (app) => {
     app.use('/api/products', productRoutes);
     app.use('/api/orders', orderRoutes);
 
-    // Servir la aplicación React (páginas de menú, etc. definidas en AppRoutes)
-    const __dirname = dirname(fileURLToPath(import.meta.url));
-    const distPath = join(__dirname, '../../client/dist');
-
-    if (existsSync(distPath)) {
-        app.use(express.static(distPath));
-        app.get(/.*/, (req, res) => {
-            res.sendFile(join(distPath, 'index.html'));
-        });
-    } else {
-        app.get('/', (req, res) => {
-            res.send('API de Módulo 2 Mafer funcionando correctamente. Frontend no disponible en esta ruta.');
-        });
-    }
+    // Ruta de bienvenida para verificar que el servidor funciona
+    app.get('/', (req, res) => {
+        res.send('API de Módulo 2 Mafer funcionando correctamente.');
+    });
 }
 
 const conectarDB = async () => {

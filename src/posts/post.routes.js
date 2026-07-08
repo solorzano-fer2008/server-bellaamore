@@ -6,9 +6,9 @@ import { validateJWT } from '../../middlewares/jwt-verify.js'
 
 const router = Router()
 
-router.post( "/", validateJWT, uploadPostImage.single('image'), createpostValidator, createPost)
+router.post("/", validateJWT, uploadPostImage.single('image'), createpostValidator, createPost)
 
-router.get( "/", getAllPosts)
+router.get("/", getAllPosts)
 
 router.get("/:id", getPostValidator, getPostById)
 

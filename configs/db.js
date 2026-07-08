@@ -3,32 +3,32 @@
 import mongoose from 'mongoose'
 
 export const dbConnection = async () => {
-    const uri = process.env.URI_MONGODB
-    console.log('URI_MONGODB:', uri ? 'CONFIGURADA' : 'NO CONFIGURADA')
+    const uri = process.env.URI_MONGODB 
+    console.log(uri)
     try {
-        mongoose.connection.on('error', (error) => {
-            console.error('MongoDB | Error de conexión:', error.message)
+        mongoose.connection.on('error', () => {
+            console.log('MondongoDB | no se puede conectar a mongoDB')
             mongoose.disconnect()
         })
 
         mongoose.connection.on('connecting', () => {
-            console.log('MongoDB | Intentando conectar a MongoDB...')
+            console.log('MongoDB | intentando conectar a mongoDB')
         })
 
         mongoose.connection.on('connected', () => {
-            console.log('MongoDB | Conectado exitosamente')
+            console.log('MongoDB | conectando a mongoDB')
         })
 
         mongoose.connection.on('open', () => {
-            console.log('MongoDB | Conexión a la base de datos establecida')
+            console.log('MongoDB | conectando a la base de datos ')
         })
 
         mongoose.connection.on('reconnected', () => {
-            console.log('MongoDB | Reconectado a MongoDB')
+            console.log('MongoDB | reconectando a mongoDB')
         })
 
         mongoose.connection.on('disconnected', () => {
-            console.log('MongoDB | Desconectado de MongoDB')
+            console.log('MongoDB | desconectado de mongoDB')
         })
 
         await mongoose.connect(uri, {
@@ -36,8 +36,6 @@ export const dbConnection = async () => {
             maxPoolSize: 10
         })
     } catch (error) {
-        console.error('Error al conectar la base de datos:', error.message)
-        console.error('Stack trace:', error.stack)
-        throw error
+        console.log(`Error al conectar la db: ${error}`)
     }
 }
