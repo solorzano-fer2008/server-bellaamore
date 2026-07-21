@@ -3,14 +3,20 @@ import { Link } from 'react-router-dom';
 import { LuUtensilsCrossed, LuPackage, LuCroissant, LuCupSoda } from 'react-icons/lu';
 import { MdBreakfastDining } from "react-icons/md";
 import backgroundImage from '../assets/img/restaurantefondo3.png';
-import { getProducts } from '../services/apiService';
+import { getProducts, updateProduct } from '../services/apiService';
 import { getImageUrl } from '../utils/getImage';
 import { ProductCard } from '../components/ui/ProductCard';
 import { ProductDetailModal } from '../components/ui/ProductDetailModal';
+import { AdminControls } from '../components/ui/AdminControls';
+import { toast } from 'react-hot-toast';
 
-export const MenuPage = () => {
+export const MenuPage = (user) => {
+    const currentUser = user?.role === 'ADMIN_ROLE' ? user : null;
     const [selectedItem, setSelectedItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedItems, setEditedItems] = useState([]);
+    const [isSaving, setIsSaving] = useState(false);
     const categories = [
         { name: 'Individuales', icon: <LuPackage className="text-3xl mb-2" /> },
         { name: 'Postres', icon: <LuCroissant className="text-3xl mb-2" /> },
@@ -47,8 +53,61 @@ export const MenuPage = () => {
         fetchItems();
     }, []);
 
+    const handleToggleEdit = () => {
+        setIsEditing(!isEditing);
+        if (!isEditing) {
+            setEditedItems([...menuItems]);
+        }
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            for (const item of editedItems) {
+                const result = await updateProduct(item._id, item);
+                if (result.error) {
+                    toast.error(`Error al actualizar ${item.title}: ${result.message}`);
+                }
+            }
+            toast.success('Cambios guardados exitosamente');
+            // Recargar los productos
+            const data = await getProducts('combos');
+            if (data && data.length > 0) {
+                setMenuItems(data);
+            }
+            setIsEditing(false);
+            setEditedItems([]);
+        } catch (error) {
+            toast.error('Error al guardar los cambios');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleCancel = () => {
+        setEditedItems([]);
+        setIsEditing(false);
+    };
+
+    const handleItemEdit = (itemId, field, value) => {
+        setEditedItems(prev => 
+            prev.map(item => 
+                item._id === itemId ? { ...item, [field]: value } : item
+            )
+        );
+    };
+
     return (
         <div className="min-h-screen bg-black text-white font-sans relative">
+            {currentUser && (
+                <AdminControls
+                    isEditing={isEditing}
+                    onToggleEdit={handleToggleEdit}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    position="top-left"
+                />
+            )}
             <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
                 style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -77,11 +136,13 @@ export const MenuPage = () => {
 
                 {/* Product Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                    {menuItems.map((item) => (
+                    {(isEditing ? editedItems : menuItems).map((item) => (
                         <ProductCard 
                             key={item._id || item.id} 
                             item={item} 
                             badgeText="Recomendado" 
+                            isEditing={isEditing}
+                            onEdit={handleItemEdit}
                             onSelect={(product) => {
                                 setSelectedItem(product);
                                 setIsModalOpen(true);

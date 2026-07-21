@@ -131,6 +131,18 @@ export const deleteCommentService = async (commentId) => {
   }
 };
 
+export const updateCommentService = async (commentId, text) => {
+  try {
+    const response = await apiClient.put(`/comments/${commentId}`, { text });
+    return response.data;
+  } catch (error) {
+    return {
+      error: true,
+      message: error.response?.data?.message || "Error al actualizar comentario",
+    };
+  }
+};
+
 export const getPostById = async (id) => {
   try {
     const response = await apiClient.get(`/posts/${id}`);
@@ -163,6 +175,18 @@ export const deletePostService = async (postId) => {
     return {
       error: true,
       message: error.response?.data?.message || "Error al eliminar publicación",
+    };
+  }
+};
+
+export const updatePostService = async (postId, postData) => {
+  try {
+    const response = await apiClient.put(`/posts/${postId}`, postData);
+    return response.data;
+  } catch (error) {
+    return {
+      error: true,
+      message: error.response?.data?.message || "Error al actualizar publicación",
     };
   }
 };

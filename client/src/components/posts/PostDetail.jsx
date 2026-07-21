@@ -1,17 +1,21 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { createCommentService, deleteCommentService } from "../../services/apiService";
+import { createCommentService, deleteCommentService, updateCommentService, updatePostService } from "../../services/apiService";
 import { CommentModal } from "./CommentModal";
 import { usePostDetail } from "../../hooks/usePostDetail";
 import { toast } from "react-hot-toast";
 import { FaStar } from "react-icons/fa";
 import { LuTrash2, LuUsers } from "react-icons/lu";
 import { DeleteConfirmModal } from "../ui/DeleteConfirmModal";
+import { AdminControls } from "../ui/AdminControls";
 
 import { getImageUrl } from "../../utils/getImage";
 
-export const PostDetail = () => {
+export const PostDetail = (user) => {
   const { id } = useParams();
+  const currentUser = user?.role === 'ADMIN_ROLE' ? user : JSON.parse(localStorage.getItem('user') || '{}');
+  const isAdmin = user?.role === 'ADMIN_ROLE' || currentUser.role === 'ADMIN_ROLE';
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [commentLoading, setCommentLoading] = useState(false);
   const { post, loading, error, fetchPost } = usePostDetail(id);
@@ -20,7 +24,11 @@ export const PostDetail = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
 
-  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  // Edit mode states
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedPost, setEditedPost] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedCommentText, setEditedCommentText] = useState('');
 
   const handleAddComment = async (content) => {
     setCommentLoading(true);
@@ -50,6 +58,62 @@ export const PostDetail = () => {
       toast.success("Comentario eliminado");
       fetchPost();
     }
+    setIsConfirmOpen(false);
+    setCommentToDelete(null);
+  };
+
+  const handleToggleEdit = () => {
+    setIsEditing(!isEditing);
+    if (!isEditing && post) {
+      setEditedPost({ ...post });
+    }
+  };
+
+  const handleSave = async () => {
+    if (editedPost) {
+      const result = await updatePostService(post._id, editedPost);
+      if (result.error) {
+        toast.error(result.message);
+      } else {
+        toast.success("Publicación actualizada");
+        fetchPost();
+      }
+    }
+    setIsEditing(false);
+    setEditedPost(null);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditedPost(null);
+    setEditingCommentId(null);
+    setEditedCommentText('');
+  };
+
+  const handlePostEdit = (field, value) => {
+    setEditedPost(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCommentEdit = (commentId, text) => {
+    setEditingCommentId(commentId);
+    setEditedCommentText(text);
+  };
+
+  const handleSaveComment = async (commentId) => {
+    const result = await updateCommentService(commentId, editedCommentText);
+    if (result.error) {
+      toast.error(result.message);
+    } else {
+      toast.success("Comentario actualizado");
+      fetchPost();
+    }
+    setEditingCommentId(null);
+    setEditedCommentText('');
+  };
+
+  const handleCancelCommentEdit = () => {
+    setEditingCommentId(null);
+    setEditedCommentText('');
   };
 
   if (loading) return <div className="text-center py-10">Cargando publicación...</div>;
@@ -65,9 +129,27 @@ export const PostDetail = () => {
     : [];
 
   return (
-    <div className="max-w-2xl mx-auto bg-white/90 backdrop-blur-md rounded-[2rem] shadow-2xl p-10 mt-10 border border-white/40">
+    <div className="max-w-2xl mx-auto bg-white/90 backdrop-blur-md rounded-[2rem] shadow-2xl p-10 mt-10 border border-white/40 relative">
+      {isAdmin && (
+        <AdminControls
+          isEditing={isEditing}
+          onToggleEdit={handleToggleEdit}
+          onSave={handleSave}
+          onCancel={handleCancel}
+          position="top-left"
+        />
+      )}
       <div className="flex justify-between items-start mb-6">
-        <h2 className="text-4xl font-serif font-bold text-gray-800 leading-tight">{post.title}</h2>
+        {isEditing && isAdmin ? (
+          <input
+            type="text"
+            value={editedPost?.title || post.title}
+            onChange={(e) => handlePostEdit('title', e.target.value)}
+            className="text-4xl font-serif font-bold text-gray-800 leading-tight w-full border-b-2 border-purple-500 focus:outline-none bg-transparent"
+          />
+        ) : (
+          <h2 className="text-4xl font-serif font-bold text-gray-800 leading-tight">{post.title}</h2>
+        )}
         <div className="flex space-x-1 mt-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <FaStar
@@ -79,7 +161,15 @@ export const PostDetail = () => {
         </div>
       </div>
 
-      <p className="text-gray-700 text-lg leading-relaxed mb-8">{post.content}</p>
+      {isEditing && isAdmin ? (
+        <textarea
+          value={editedPost?.content || post.content}
+          onChange={(e) => handlePostEdit('content', e.target.value)}
+          className="text-gray-700 text-lg leading-relaxed mb-8 w-full border-2 border-purple-500 rounded-lg p-4 focus:outline-none bg-transparent min-h-[200px]"
+        />
+      ) : (
+        <p className="text-gray-700 text-lg leading-relaxed mb-8">{post.content}</p>
+      )}
       
       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
         <div className="text-sm text-gray-500">
@@ -111,18 +201,55 @@ export const PostDetail = () => {
           post.comments.map((comment) => (
             <div key={comment._id} className="group bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/40 shadow-sm transition-all hover:bg-white/60 relative">
               
-              {/* Botón Borrar (Solo si es el autor) */}
-              {(comment.author?._id === currentUser.uid || comment.author === currentUser.uid || comment.author?._id === currentUser.id || comment.author === currentUser.id) && (
-                <button 
-                  onClick={() => handleDeleteClick(comment._id)}
-                  className="absolute top-4 right-4 p-2 text-gray-400 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
-                  title="Borrar comentario"
-                >
-                  <LuTrash2 className="text-xl" />
-                </button>
-              )}
+              {/* Botones de acción para admin */}
+              <div className="absolute top-4 right-4 flex gap-2">
+                {isAdmin && isEditing && (
+                  <>
+                    <button 
+                      onClick={() => handleCommentEdit(comment._id, comment.text)}
+                      className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
+                      title="Editar comentario"
+                    >
+                      <LuTrash2 className="text-xl" />
+                    </button>
+                  </>
+                )}
+                {(comment.author?._id === currentUser.uid || comment.author === currentUser.uid || comment.author?._id === currentUser.id || comment.author === currentUser.id) && (
+                  <button 
+                    onClick={() => handleDeleteClick(comment._id)}
+                    className="p-2 text-gray-400 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Borrar comentario"
+                  >
+                    <LuTrash2 className="text-xl" />
+                  </button>
+                )}
+              </div>
 
-              <div className="text-gray-800 text-lg leading-relaxed mb-4 pr-8">{comment.text}</div>
+              {editingCommentId === comment._id && isAdmin ? (
+                <div className="mb-4 pr-8">
+                  <textarea
+                    value={editedCommentText}
+                    onChange={(e) => setEditedCommentText(e.target.value)}
+                    className="w-full border-2 border-purple-500 rounded-lg p-3 focus:outline-none bg-transparent min-h-[100px]"
+                  />
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => handleSaveComment(comment._id)}
+                      className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      onClick={handleCancelCommentEdit}
+                      className="px-3 py-1 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-800 text-lg leading-relaxed mb-4 pr-8">{comment.text}</div>
+              )}
               <div className="flex items-center space-x-3 pt-4 border-t border-gray-100/50">
                 <img
                   src={comment.author?.profilepicture ? getImageUrl(comment.author.profilepicture) : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
