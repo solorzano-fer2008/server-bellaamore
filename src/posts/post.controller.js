@@ -100,6 +100,39 @@ export const getPostById = async (req, res) => {
     }
 }
 
+export const updatePost = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, content, category, rating } = req.body;
+        let image = req.file ? req.file.path : undefined;
+
+        const post = await Post.findById(id);
+
+        if (!post) {
+            return res.status(404).json({ message: "Publicación no encontrada" });
+        }
+
+        const updateData = {};
+        if (title !== undefined) updateData.title = title;
+        if (content !== undefined) updateData.content = content;
+        if (category !== undefined) updateData.category = category;
+        if (rating !== undefined) updateData.rating = rating;
+        if (image !== undefined) updateData.image = image;
+
+        const updatedPost = await Post.findByIdAndUpdate(id, updateData, { new: true })
+            .populate('author', 'name surname username profilePicture')
+            .populate('comments');
+
+        return res.status(200).json({
+            message: "Publicación actualizada exitosamente",
+            post: updatedPost
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error al actualizar la publicación" });
+    }
+};
+
 export const deletePost = async (req, res) => {
     try {
         const { id } = req.params;

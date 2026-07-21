@@ -42,7 +42,7 @@ app.options('*', (req, res) => {
 */
 
     app.use(express.json());
-    app.use(express.urlencoded({ extended: false }));
+    app.use(express.urlencoded({ extended: false })); 
     app.use(helmet({
         crossOriginResourcePolicy: { policy: "cross-origin" },
         crossOriginEmbedderPolicy: false

@@ -34,6 +34,31 @@ export const createcomment = async (req, res) => {
     }
 };
 
+export const updateComment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { text } = req.body;
+
+        const comment = await Comment.findById(id);
+
+        if (!comment) {
+            return res.status(404).json({ message: "Comentario no encontrado" });
+        }
+
+        const updatedComment = await Comment.findByIdAndUpdate(id, { text }, { new: true })
+            .populate('author', 'username name surname profilePicture')
+            .populate('post', 'title');
+
+        return res.status(200).json({
+            message: "Comentario actualizado exitosamente",
+            comment: updatedComment
+        });
+    } catch (error) {
+        console.error("Error al actualizar comentario:", error);
+        return res.status(500).json({ message: "Error al actualizar el comentario" });
+    }
+};
+
 export const deleteComment = async (req, res) => {
     try {
         const { id } = req.params;
