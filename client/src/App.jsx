@@ -15,14 +15,20 @@ export const App = () => {
     const savedUser = localStorage.getItem('user');
     
     if (token && savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      console.log('App - Loading user from localStorage:', parsedUser);
+      console.log('App - User role:', parsedUser.role);
       setIsAuthenticated(true);
-      setUser(JSON.parse(savedUser));
+      setUser(parsedUser);
     }
   }, []);
 
   const handleLoginSuccess = (userData) => {
+    console.log('App - Login success, userData:', userData);
+    console.log('App - Login success, userDetails:', userData.userDetails);
+    console.log('App - Login success, role:', userData.userDetails?.role);
     setIsAuthenticated(true);
-    setUser(userData);
+    setUser(userData.userDetails);
   };
 
   const handleLogout = () => {
@@ -36,7 +42,7 @@ export const App = () => {
     <BrowserRouter>
       <CartProvider>
         <DashboardPage user={user} onLogout={handleLogout}>
-          <AppRoutes onLoginSuccess={handleLoginSuccess} />
+          <AppRoutes onLoginSuccess={handleLoginSuccess} user={user} />
         </DashboardPage>
 
         <Toaster 

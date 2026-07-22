@@ -27,29 +27,29 @@ import { AdminRoute } from "../components/auth/AdminRoute";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 
-export const AppRoutes = ({ onLoginSuccess }) => (
+export const AppRoutes = ({ onLoginSuccess, user }) => (
   <Routes>
     <Route path="/login" element={<LoginPage onLoginSuccess={onLoginSuccess} />} />
     <Route path="/registro" element={<RegisterPage onLoginSuccess={onLoginSuccess} />} />
     <Route path="/" element={<Welcome />} />
-    <Route path="/publicaciones" element={<PostList />} />
-    <Route path="/promociones" element={<PromotionsPage />} />
-    <Route path="/menu" element={<MenuPage />} />
-    <Route path="/menu/individuales" element={<IndividualesPage />} />
-    <Route path="/menu/postres" element={<PostresPage />} />
-    <Route path="/menu/bebidas" element={<BebidasPage />} />
-    <Route path="/menu/desayunos" element={<DesayunosPage />} />
-    <Route path="/menu/brunch" element={<BrunchPage />} />
-    <Route path="/menu/almuerzos" element={<AlmuerzosPage />} />
-    <Route path="/menu/cenas" element={<CenasPage />} />
-    <Route path="/ubicaciones" element={<UbicacionesPage />} />
-    <Route path="/carrito" element={<CartPage />} />
-    <Route path="/checkout" element={<CheckoutPage />} />
-    <Route path="/domicilio" element={<ProtectedRoute><DomicilioPage /></ProtectedRoute>} />
-    <Route path="/reservaciones" element={<ProtectedRoute><ReservacionesPage /></ProtectedRoute>} />
-    <Route path="/publicaciones/crear" element={<ProtectedRoute><PostForm /></ProtectedRoute>} />
-    <Route path="/posts/:id" element={<PostDetail />} />
-    <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-    <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+    <Route path="/publicaciones" element={<PostList user={user} />} />
+    <Route path="/promociones" element={<PromotionsPage user={user} />} />
+    <Route path="/menu" element={<MenuPage user={user} />} />
+    <Route path="/menu/individuales" element={<IndividualesPage user={user} />} />
+    <Route path="/menu/postres" element={<PostresPage user={user} />} />
+    <Route path="/menu/bebidas" element={<BebidasPage user={user} />} />
+    <Route path="/menu/desayunos" element={<DesayunosPage user={user} />} />
+    <Route path="/menu/brunch" element={<BrunchPage user={user} />} />
+    <Route path="/menu/almuerzos" element={<AlmuerzosPage user={user} />} />
+    <Route path="/menu/cenas" element={<CenasPage user={user} />} />
+    <Route path="/ubicaciones" element={<UbicacionesPage user={user} />} />
+    <Route path="/carrito" element={<CartPage user={user} />} />
+    <Route path="/checkout" element={<CheckoutPage user={user} />} />
+    <Route path="/domicilio" element={<ProtectedRoute><DomicilioPage user={user} /></ProtectedRoute>} />
+    <Route path="/reservaciones" element={<ProtectedRoute><ReservacionesPage user={user} /></ProtectedRoute>} />
+    <Route path="/publicaciones/crear" element={<ProtectedRoute><PostForm user={user} /></ProtectedRoute>} />
+    <Route path="/posts/:id" element={<PostDetail user={user} />} />
+    <Route path="/perfil" element={<ProtectedRoute><ProfilePage user={user} /></ProtectedRoute>} />
+    <Route path="/admin" element={<AdminRoute><AdminPage user={user} /></AdminRoute>} />
   </Routes>
 );

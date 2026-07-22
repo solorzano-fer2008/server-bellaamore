@@ -10,8 +10,14 @@ import { ProductDetailModal } from '../components/ui/ProductDetailModal';
 import { AdminControls } from '../components/ui/AdminControls';
 import { toast } from 'react-hot-toast';
 
-export const MenuPage = (user) => {
-    const currentUser = user?.role === 'ADMIN_ROLE' ? user : null;
+export const MenuPage = ({ user }) => {
+    console.log('MenuPage - User received:', user);
+    console.log('MenuPage - User role:', user?.role);
+    console.log('MenuPage - User role type:', typeof user?.role);
+    const isAdmin = user?.role === 'ADMIN_ROLE';
+    console.log('MenuPage - isAdmin check:', isAdmin);
+    console.log('MenuPage - ADMIN_ROLE string:', 'ADMIN_ROLE');
+    console.log('MenuPage - Role comparison:', user?.role === 'ADMIN_ROLE');
     const [selectedItem, setSelectedItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -99,7 +105,7 @@ export const MenuPage = (user) => {
 
     return (
         <div className="min-h-screen bg-black text-white font-sans relative">
-            {currentUser && (
+            {isAdmin && (
                 <AdminControls
                     isEditing={isEditing}
                     onToggleEdit={handleToggleEdit}
