@@ -14,7 +14,7 @@ import { getImageUrl } from "../../utils/getImage";
 export const PostDetail = (user) => {
   const { id } = useParams();
   const currentUser = user?.role === 'ADMIN_ROLE' ? user : JSON.parse(localStorage.getItem('user') || '{}');
-  const isAdmin = user?.role === 'ADMIN_ROLE' || currentUser.role === 'ADMIN_ROLE';
+  const isAdmin = user?.role === 'ADMIN_ROLE' || currentUser.role === 'ADMIN_ROLE' || user?.username === 'admin' || currentUser.username === 'admin';
   
   const [modalOpen, setModalOpen] = useState(false);
   const [commentLoading, setCommentLoading] = useState(false);

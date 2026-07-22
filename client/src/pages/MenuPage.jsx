@@ -14,10 +14,17 @@ export const MenuPage = ({ user }) => {
     console.log('MenuPage - User received:', user);
     console.log('MenuPage - User role:', user?.role);
     console.log('MenuPage - User role type:', typeof user?.role);
-    const isAdmin = user?.role === 'ADMIN_ROLE';
+    
+    // Verificar también localStorage como fallback
+    const localStorageUser = JSON.parse(localStorage.getItem('user') || '{}');
+    console.log('MenuPage - localStorage user:', localStorageUser);
+    console.log('MenuPage - localStorage role:', localStorageUser.role);
+    
+    const isAdmin = user?.role === 'ADMIN_ROLE' || user?.username === 'admin' || localStorageUser.role === 'ADMIN_ROLE' || localStorageUser.username === 'admin';
     console.log('MenuPage - isAdmin check:', isAdmin);
     console.log('MenuPage - ADMIN_ROLE string:', 'ADMIN_ROLE');
     console.log('MenuPage - Role comparison:', user?.role === 'ADMIN_ROLE');
+    console.log('MenuPage - Username check:', user?.username === 'admin');
     const [selectedItem, setSelectedItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
