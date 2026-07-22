@@ -3,14 +3,22 @@ import { Link } from 'react-router-dom';
 import { LuUtensilsCrossed, LuArrowLeft } from 'react-icons/lu';
 import { MdBreakfastDining } from 'react-icons/md';
 import backgroundImage from '../assets/img/restaurantefondo3.png';
-import { getProducts } from '../services/apiService';
+import { getProducts, updateProduct } from '../services/apiService';
 import { getImageUrl } from '../utils/getImage';
 import { ProductCard } from '../components/ui/ProductCard';
 import { ProductDetailModal } from '../components/ui/ProductDetailModal';
+import { AdminControls } from '../components/ui/AdminControls';
+import { toast } from 'react-hot-toast';
 
-export const DesayunosPage = () => {
+export const DesayunosPage = ({ user }) => {
+    const localStorageUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const isAdmin = user?.role === 'ADMIN_ROLE' || user?.username === 'admin' || localStorageUser.role === 'ADMIN_ROLE' || localStorageUser.username === 'admin';
+    
     const [selectedItem, setSelectedItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedItems, setEditedItems] = useState([]);
+    const [isSaving, setIsSaving] = useState(false);
     const [items, setItems] = useState([
         {
             _id: 'd1',
@@ -65,8 +73,60 @@ export const DesayunosPage = () => {
         fetchItems();
     }, []);
 
+    const handleToggleEdit = () => {
+        setIsEditing(!isEditing);
+        if (!isEditing) {
+            setEditedItems([...items]);
+        }
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            for (const item of editedItems) {
+                const result = await updateProduct(item._id, item);
+                if (result.error) {
+                    toast.error(`Error al actualizar ${item.title}: ${result.message}`);
+                }
+            }
+            toast.success('Cambios guardados exitosamente');
+            const data = await getProducts('desayunos');
+            if (data && data.length > 0) {
+                setItems(data);
+            }
+            setIsEditing(false);
+            setEditedItems([]);
+        } catch (error) {
+            toast.error('Error al guardar los cambios');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleCancel = () => {
+        setEditedItems([]);
+        setIsEditing(false);
+    };
+
+    const handleItemEdit = (itemId, field, value) => {
+        setEditedItems(prev => 
+            prev.map(item => 
+                item._id === itemId ? { ...item, [field]: value } : item
+            )
+        );
+    };
+
     return (
         <div className="min-h-screen bg-black text-white font-sans relative">
+            {isAdmin && (
+                <AdminControls
+                    isEditing={isEditing}
+                    onToggleEdit={handleToggleEdit}
+                    onSave={handleSave}
+                    onCancel={handleCancel}
+                    position="top-right"
+                />
+            )}
             <div
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
                 style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -91,7 +151,9 @@ export const DesayunosPage = () => {
                     {items.map((item) => (
                         <ProductCard 
                             key={item._id || item.id} 
-                            item={item} 
+                            item={isEditing ? (editedItems.find(e => e._id === item._id) || item) : item}
+                            isEditing={isEditing}
+                            onEdit={handleItemEdit}
                             badgeText="Favorito del Chef" 
                             onSelect={(product) => {
                                 setSelectedItem(product);
