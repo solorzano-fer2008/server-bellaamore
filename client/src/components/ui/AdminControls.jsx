@@ -20,29 +20,29 @@ export const AdminControls = ({
       {!isEditing ? (
         <button
           onClick={onToggleEdit}
-          className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2"
+          className="bg-white hover:bg-gray-100 text-gray-800 p-5 rounded-full shadow-2xl transition-all duration-300 flex items-center gap-2 border-2 border-gray-200"
           title="Activar modo edición"
         >
-          <FiEdit className="text-xl" />
-          <span className="hidden md:inline font-semibold">Editar</span>
+          <FiEdit className="text-3xl" />
+          <span className="hidden md:inline font-semibold text-lg">Editar</span>
         </button>
       ) : (
         <>
           <button
             onClick={onSave}
-            className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2"
+            className="bg-white hover:bg-gray-100 text-green-600 p-5 rounded-full shadow-2xl transition-all duration-300 flex items-center gap-2 border-2 border-green-200"
             title="Guardar cambios"
           >
-            <FiSave className="text-xl" />
-            <span className="hidden md:inline font-semibold">Guardar</span>
+            <FiSave className="text-3xl" />
+            <span className="hidden md:inline font-semibold text-lg">Guardar</span>
           </button>
           <button
             onClick={onCancel}
-            className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2"
+            className="bg-white hover:bg-gray-100 text-red-600 p-5 rounded-full shadow-2xl transition-all duration-300 flex items-center gap-2 border-2 border-red-200"
             title="Cancelar edición"
           >
-            <FiX className="text-xl" />
-            <span className="hidden md:inline font-semibold">Cancelar</span>
+            <FiX className="text-3xl" />
+            <span className="hidden md:inline font-semibold text-lg">Cancelar</span>
           </button>
         </>
       )}
