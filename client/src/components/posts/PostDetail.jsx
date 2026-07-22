@@ -136,7 +136,7 @@ export const PostDetail = (user) => {
           onToggleEdit={handleToggleEdit}
           onSave={handleSave}
           onCancel={handleCancel}
-          position="top-left"
+          position="top-right"
         />
       )}
       <div className="flex justify-between items-start mb-6">

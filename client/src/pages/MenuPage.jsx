@@ -118,7 +118,7 @@ export const MenuPage = ({ user }) => {
                     onToggleEdit={handleToggleEdit}
                     onSave={handleSave}
                     onCancel={handleCancel}
-                    position="top-left"
+                    position="top-right"
                 />
             )}
             <div
